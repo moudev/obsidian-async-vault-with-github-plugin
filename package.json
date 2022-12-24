@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "obsidian-async-vault-with-github-plugin",
+	"version": "0.0.1",
+	"description": "Create a backup of the vault and sync it with a GitHub repository",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
