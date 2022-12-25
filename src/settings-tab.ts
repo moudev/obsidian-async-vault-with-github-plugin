@@ -1,6 +1,8 @@
-import { App, PluginSettingTab,Setting } from "obsidian";
+import { App, PluginSettingTab, Setting } from "obsidian";
 
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
+// https://www.youtube.com/watch?v=0-8v7XkKiHc
+// https://devblogs.microsoft.com/typescript/announcing-typescript-3-8-beta/#type-only-imports-exports
 import type AsyncVaultPlugin from './main';
 
 class SettingsTab extends PluginSettingTab {
