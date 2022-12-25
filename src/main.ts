@@ -1,4 +1,4 @@
-import { Plugin } from 'obsidian';
+import { Plugin } from "obsidian"
 
 import { AsyncModal } from "./async-modal"
 import { SettingsTab } from "./settings-tab"
@@ -8,31 +8,31 @@ interface MyPluginSettings {
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	mySetting: "default"
 }
 
 export default class AsyncVaultPlugin extends Plugin {
-	settings: MyPluginSettings;
+	settings: MyPluginSettings
 
 	async onload() {
-		await this.loadSettings();
+		await this.loadSettings()
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			new AsyncModal(this.app).open();
-		});
+		const ribbonIconEl = this.addRibbonIcon("dice", "Sample Plugin", () => {
+			new AsyncModal(this.app).open()
+		})
 		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+		ribbonIconEl.addClass("my-plugin-ribbon-class")
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SettingsTab(this.app, this));
+		this.addSettingTab(new SettingsTab(this.app, this))
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
 	}
 
 	async saveSettings() {
-		await this.saveData(this.settings);
+		await this.saveData(this.settings)
 	}
 }
