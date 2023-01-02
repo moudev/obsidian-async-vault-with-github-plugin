@@ -1,5 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian"
 
+import { getGitHelp } from "./git"
+
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
 // https://www.youtube.com/watch?v=0-8v7XkKiHc
 // https://devblogs.microsoft.com/typescript/announcing-typescript-3-8-beta/#type-only-imports-exports
@@ -13,9 +15,9 @@ class SettingsTab extends PluginSettingTab {
 		this.plugin = plugin
 	}
 
-	display(): void {
+	async display(): Promise<void> {
 		const { containerEl } = this
-
+		console.log(await getGitHelp())
 		containerEl.empty()
 
 		containerEl.createEl("h2", { text: "Settings for my awesome plugin." })

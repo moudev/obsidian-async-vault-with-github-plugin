@@ -31,6 +31,8 @@ esbuild.build({
 		"@lezer/common",
 		"@lezer/highlight",
 		"@lezer/lr",
+		"node:child_process",
+		"node:util",
 		...builtins],
 	format: "cjs",
 	watch: !prod,
