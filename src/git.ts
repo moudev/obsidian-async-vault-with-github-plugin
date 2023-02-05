@@ -10,42 +10,47 @@ const isGitInstalled = async () => {
   try {
     const { stdout, stderr } = await _exec("git --version")
 
-    console.log("stdout", stdout)
-    console.log("stderr", stderr)
-
-    if (stderr) {
-      return false
-    }
-    return true
-  } catch (error) {
-    console.log(error)
-    return false
-  }
-}
-
-const executeGitCommand = async(command: string):Promise<string> => {
-  try {
-    const isGitAvailable = await isGitInstalled()
-    if (!isGitAvailable) {
-      return Promise.reject("Error. Install git")
-    }
-
-    const { stdout, stderr } = await _exec(command)
-
     if (stderr) {
       return Promise.reject(stderr)
     }
 
     return Promise.resolve(stdout)
   } catch (error) {
-    console.log("executeGitCommand error:", error)
-    return Promise.reject("Error. Install git")
+    const { message } = error
+    if (message.includes("is not recognized as an internal or external command")) {
+      return Promise.reject("Install git")
+    } else {
+      return Promise.reject("Command failed")
+    }
   }
 }
 
-const getGitHelp = async ():Promise<string> => {
-  const result = await executeGitCommand("git --help")
-  return result
+const createRepository = async (vault: string) => {
+  try {
+    await isGitInstalled()
+
+    // execute commands from another path
+    // https://stackoverflow.com/questions/13430613/how-to-use-git-from-another-directory
+    const { stdout, stderr } = await _exec(`git -C ${vault} init`)
+    if (stderr) {
+      return Promise.reject(stderr)
+    }
+    return Promise.resolve(stdout)
+  } catch (error) {
+    return Promise.reject("Repository was not created")
+  }
 }
 
-export { isGitInstalled, executeGitCommand, getGitHelp }
+const executeGitCommand = async(command: string, vault: string):Promise<string> => {
+  try {
+    await createRepository(vault)
+
+    const { stdout, stderr } = await _exec(`git -C ${vault} ${command}`)
+
+    return Promise.resolve(stdout || stderr)
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
+export { isGitInstalled, createRepository, executeGitCommand }

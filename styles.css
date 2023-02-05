@@ -6,3 +6,23 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+.async-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+.async-form label {
+  margin-bottom: 0.5rem;
+}
+
+.async-form label + input {
+  margin-bottom: 1rem;
+}
+
+.async-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}

@@ -17,12 +17,9 @@ export default class AsyncVaultPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings()
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon("dice", "Sample Plugin", () => {
+		this.addRibbonIcon("refresh-cw", "Async vault with GitHub", async () => {
 			new AsyncModal(this.app).open()
 		})
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass("my-plugin-ribbon-class")
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SettingsTab(this.app, this))
