@@ -1,24 +1,26 @@
-import { Plugin } from "obsidian"
+import { Plugin, FileSystemAdapter } from "obsidian"
 
 import { AsyncModal } from "./async-modal"
 import { SettingsTab } from "./settings-tab"
 
-interface MyPluginSettings {
-	mySetting: string;
+interface PluginSettings {
+	githubRepositoryURL: string;
+	isRepositoryConfigured: boolean;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: "default"
+const DEFAULT_SETTINGS: PluginSettings = {
+	githubRepositoryURL: "",
+	isRepositoryConfigured: false,
 }
 
 export default class AsyncVaultPlugin extends Plugin {
-	settings: MyPluginSettings
+	settings: PluginSettings
 
 	async onload() {
 		await this.loadSettings()
 
 		this.addRibbonIcon("refresh-cw", "Async vault with GitHub", async () => {
-			new AsyncModal(this.app).open()
+			new AsyncModal(this.app, this).open()
 		})
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
@@ -31,5 +33,15 @@ export default class AsyncVaultPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings)
+	}
+
+	getVaultPath(): string {
+		// https://forum.obsidian.md/t/how-to-get-vault-absolute-path/22965/6
+		const adapter = this.app.vault.adapter
+		if (adapter instanceof FileSystemAdapter) {
+			return this.app.vault.adapter.getBasePath()
+		}
+
+		return ""
 	}
 }

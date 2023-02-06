@@ -1,13 +1,21 @@
-import { App, Modal, FileSystemAdapter } from "obsidian"
+import { App, Modal } from "obsidian"
 
 import { executeGitCommand } from "./git"
+
+// https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
+// https://www.youtube.com/watch?v=0-8v7XkKiHc
+// https://devblogs.microsoft.com/typescript/announcing-typescript-3-8-beta/#type-only-imports-exports
+import type AsyncVaultPlugin from "./main"
 
 // https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/1.8.12/src/dialogs/Prompt.ts#L18
 class AsyncModal extends Modal {
 	defaultCommitMessage: string
-  constructor(app: App) {
+  plugin: AsyncVaultPlugin
+
+  constructor(app: App, plugin: AsyncVaultPlugin) {
     super(app)
 		this.defaultCommitMessage = `async from ${new Date()}`
+    this.plugin = plugin
   }
 
   onOpen() {
@@ -39,15 +47,14 @@ class AsyncModal extends Modal {
     resultsContainer.addClass("async-git-results")
     
     form.onsubmit = async (e) => {
-      e.preventDefault()
-			console.log("Submit", messageInput.value)
-      // https://forum.obsidian.md/t/how-to-get-vault-absolute-path/22965/6
-			const adapter = this.app.vault.adapter
-			if (adapter instanceof FileSystemAdapter) {
-				const vaultPath = this.app.vault.adapter.getBasePath()
-        const gitResult = await executeGitCommand("status", vaultPath)
+      try {
+        e.preventDefault()
+        console.log("Submit", messageInput.value)
+        const gitResult = await executeGitCommand("status", this.plugin.getVaultPath())
         this.formatResult(gitResult, resultsContainer)
-			}
+      } catch (error) {
+        this.formatResult(error, resultsContainer)
+      }
     }
   }
 
