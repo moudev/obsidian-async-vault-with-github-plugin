@@ -44,4 +44,21 @@ export default class AsyncVaultPlugin extends Plugin {
 
 		return ""
 	}
+
+	formatResult(result: string, container: HTMLElement) {
+    container.innerHTML = ""
+  
+    if (!result) {
+      container.textContent = ""
+    }
+
+    const chunks = result.split("\n")
+    console.log(chunks)
+    container.toggleClass("visible", true)
+    chunks.forEach(text => {
+      if (text) {
+        container.createEl("p").setText(text)
+      }
+    })
+  }
 }

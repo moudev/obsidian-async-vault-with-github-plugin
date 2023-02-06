@@ -51,9 +51,9 @@ class AsyncModal extends Modal {
         e.preventDefault()
         console.log("Submit", messageInput.value)
         const gitResult = await executeGitCommand("status", this.plugin.getVaultPath())
-        this.formatResult(gitResult, resultsContainer)
+        this.plugin.formatResult(gitResult, resultsContainer)
       } catch (error) {
-        this.formatResult(error, resultsContainer)
+        this.plugin.formatResult(error, resultsContainer)
       }
     }
   }
@@ -61,23 +61,6 @@ class AsyncModal extends Modal {
   onClose() {
     const { contentEl } = this
     contentEl.empty()
-  }
-
-  formatResult(result: string, container: HTMLElement) {
-    container.innerHTML = ""
-  
-    if (!result) {
-      container.textContent = ""
-    }
-
-    const chunks = result.split("\n")
-    console.log(chunks)
-    container.toggleClass("visible", true)
-    chunks.forEach(text => {
-      if (text) {
-        container.createEl("p").setText(text)
-      }
-    })
   }
 }
 
