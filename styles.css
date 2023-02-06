@@ -26,3 +26,25 @@ If your plugin does not need CSS, delete this file.
   gap: 1rem;
   margin-top: 2rem;
 }
+
+.async-git-results {
+ display: none;
+  flex-direction: column;  
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: 5px;
+  background: var(--background-modifier-form-field);
+  color: var(--code-normal);
+  padding: 1rem;
+  margin-top: 2rem;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.async-git-results.visible {
+  display: flex;
+}
+
+.async-git-results p {
+  margin: 0px;
+  padding: 0px;
+}
