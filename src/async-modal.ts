@@ -7,6 +7,7 @@ import { executeGitCommand } from "./git"
 // https://devblogs.microsoft.com/typescript/announcing-typescript-3-8-beta/#type-only-imports-exports
 import type AsyncVaultPlugin from "./main"
 
+// TODO: add validation if git exists
 // https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/1.8.12/src/dialogs/Prompt.ts#L18
 class AsyncModal extends Modal {
 	defaultCommitMessage: string
@@ -53,7 +54,7 @@ class AsyncModal extends Modal {
         const gitResult = await executeGitCommand("status", this.plugin.getVaultPath())
         this.plugin.formatResult(gitResult, resultsContainer)
       } catch (error) {
-        this.plugin.formatResult(error, resultsContainer)
+        this.plugin.formatResult(error.message, resultsContainer)
       }
     }
   }

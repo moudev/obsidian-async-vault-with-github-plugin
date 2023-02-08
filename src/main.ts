@@ -52,9 +52,9 @@ export default class AsyncVaultPlugin extends Plugin {
       container.textContent = ""
     }
 
+		container.toggleClass("visible", true)
+
     const chunks = result.split("\n")
-    console.log(chunks)
-    container.toggleClass("visible", true)
     chunks.forEach(text => {
       if (text) {
         container.createEl("p").setText(text)
