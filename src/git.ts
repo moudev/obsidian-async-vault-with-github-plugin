@@ -16,12 +16,7 @@ const isGitInstalled = async () => {
 
     return Promise.resolve(stdout)
   } catch (error) {
-    const { message } = error
-    if (message.includes("is not recognized as an internal or external command")) {
-      return Promise.reject("Install git")
-    } else {
-      return Promise.reject("Command failed")
-    }
+    return Promise.reject(error.message)
   }
 }
 

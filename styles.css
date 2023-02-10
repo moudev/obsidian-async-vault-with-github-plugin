@@ -7,9 +7,13 @@ If your plugin does not need CSS, delete this file.
 
 */
 .async-form {
-  display: flex;
+  display: none;
   flex-direction: column;
   margin-top: 2rem;
+}
+
+.async-form.visible {
+  display: flex;
 }
 
 .async-form label {
@@ -21,10 +25,14 @@ If your plugin does not need CSS, delete this file.
 }
 
 .async-form-actions {
-  display: flex;
+  display: none;  
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 2rem;
+}
+
+.async-form-actions.visible {
+  display: flex;
 }
 
 .async-git-results {

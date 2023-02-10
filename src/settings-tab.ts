@@ -1,13 +1,12 @@
 import { App, PluginSettingTab, Setting } from "obsidian"
 
-import { executeGitCommand } from "./git"
+import { executeGitCommand, isGitInstalled } from "./git"
 
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
 // https://www.youtube.com/watch?v=0-8v7XkKiHc
 // https://devblogs.microsoft.com/typescript/announcing-typescript-3-8-beta/#type-only-imports-exports
 import type AsyncVaultPlugin from "./main"
 
-// TODO: add validation if git exists
 class SettingsTab extends PluginSettingTab {
 	plugin: AsyncVaultPlugin
 
@@ -21,9 +20,28 @@ class SettingsTab extends PluginSettingTab {
 
 		const { containerEl } = this
 		containerEl.empty()
-		containerEl.createEl("h2", { text: "Settings" })
+		containerEl.createEl("h1", { text: "Async vault with GitHub settings" })
 
-		new Setting(containerEl)
+		const inputsContainer = containerEl.createDiv()
+
+		const actionsContainer = containerEl.createDiv()
+		actionsContainer.addClass("async-git-config-actions")
+
+		const resultsContainer = containerEl.createDiv()
+		resultsContainer.addClass("async-git-results")		
+
+		try {
+			await isGitInstalled()
+		} catch (error) {			
+			this.plugin.formatResult(error, resultsContainer)
+			resultsContainer.createEl("h2", { text: "Error: Make sure that git is installed and configurated with your GitHub credentials." })
+			resultsContainer.createEl("a", { text: "Install git" }).setAttr("href", "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git")
+			resultsContainer.createEl("a", { text: "Create GitHub account" }).setAttr("href", "https://github.com")
+			resultsContainer.createEl("a", { text: "Configurate git with GitHub credentials" }).setAttr("href", "https://docs.github.com/en/get-started/quickstart/set-up-git")
+			return
+		}
+
+		new Setting(inputsContainer)
 			.setName("GitHub repository URL")
 			.setDesc("Public or private. You must to have permissions in this repository")
 			.addText(
@@ -39,9 +57,6 @@ class SettingsTab extends PluginSettingTab {
 						resultsContainer.toggleClass("visible", false)
 					})
 			)
-
-		const actionsContainer = containerEl.createDiv()
-		actionsContainer.addClass("async-git-config-actions")
 
 		const submitButton = actionsContainer.createEl("button")
 		submitButton.setText("Configurate repository")
@@ -78,9 +93,6 @@ class SettingsTab extends PluginSettingTab {
 		if (!this.plugin.settings.isRepositoryConfigured) {
 			actionsContainer.toggleClass("visible", true)
 		}
-
-		const resultsContainer = containerEl.createDiv()
-		resultsContainer.addClass("async-git-results")
 	}
 }
 
