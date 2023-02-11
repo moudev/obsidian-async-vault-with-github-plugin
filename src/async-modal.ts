@@ -39,6 +39,12 @@ class AsyncModal extends Modal {
 			return
 		}
 
+    if (!this.plugin.settings.isRepositoryConfigured) {
+      this.plugin.formatResult("", resultsContainer)
+      resultsContainer.createEl("strong", { text: "Error: Make sure that GitHub repository is configured in plugin settings tab." })
+      return
+    }
+
     form.addClass("async-form")
     form.type = "submit"
 		form.createEl("label").setText("Commit message:")
