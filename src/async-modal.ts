@@ -51,8 +51,10 @@ class AsyncModal extends Modal {
     form.onsubmit = async (e) => {
       try {
         e.preventDefault()
-        const gitResult = await executeGitCommand("status", this.plugin.getVaultPath())
-        this.plugin.formatResult(gitResult, resultsContainer)
+        const gitResult = await executeGitCommand("add .", this.plugin.getVaultPath())
+        const gitCommit = await executeGitCommand(`commit -m "${messageInput.value}"`, this.plugin.getVaultPath())
+        const gitPush = await executeGitCommand("push origin main", this.plugin.getVaultPath())
+        this.plugin.formatResult(`${gitResult} ${gitCommit} ${gitPush}`, resultsContainer)
       } catch (error) {
         this.plugin.formatResult(error.message, resultsContainer)
       }
