@@ -66,3 +66,18 @@ If your plugin does not need CSS, delete this file.
 .async-git-config-actions.visible {
   display: flex;
 }
+
+.async-git-settings-info {
+  display: none;
+  margin-top: 2rem;
+  flex-direction: column;
+  row-gap: 5px;
+}
+
+.async-git-settings-info p {
+  margin: 0;
+}
+
+.async-git-settings-info.visible {
+  display: flex;
+}

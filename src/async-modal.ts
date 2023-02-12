@@ -19,6 +19,8 @@ class AsyncModal extends Modal {
   }
 
   async onOpen() {
+    const vault = this.plugin.getVaultPath()
+
     const { contentEl } = this
     contentEl.createEl("h1", { text: "Async vault with GitHub" })
 
@@ -30,7 +32,7 @@ class AsyncModal extends Modal {
 
     try {
 			await isGitInstalled()
-		} catch (error) {			
+		} catch (error) {
 			this.plugin.formatResult(error, resultsContainer)
 			resultsContainer.createEl("h4", { text: "Error: Make sure that git is installed and configurated with your GitHub credentials." })
 			resultsContainer.createEl("a", { text: "Install git" }).setAttr("href", "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git")
@@ -51,10 +53,10 @@ class AsyncModal extends Modal {
     form.onsubmit = async (e) => {
       try {
         e.preventDefault()
-        const gitResult = await executeGitCommand("add .", this.plugin.getVaultPath())
-        const gitCommit = await executeGitCommand(`commit -m "${messageInput.value}"`, this.plugin.getVaultPath())
-        const gitPush = await executeGitCommand("push origin main", this.plugin.getVaultPath())
-        this.plugin.formatResult(`${gitResult} ${gitCommit} ${gitPush}`, resultsContainer)
+        const gitAdd = await executeGitCommand("add .", vault)
+        const gitCommit = await executeGitCommand(`commit -m "${messageInput.value}"`, vault)
+        const gitPush = await executeGitCommand("push origin main", vault)
+        this.plugin.formatResult(`${gitAdd} ${gitCommit} ${gitPush}`, resultsContainer)
       } catch (error) {
         this.plugin.formatResult(error.message, resultsContainer)
       }
@@ -64,9 +66,14 @@ class AsyncModal extends Modal {
     messageInput.type = "text"
 		messageInput.setAttr("name", "commit-message")
 		messageInput.value = this.defaultCommitMessage
-    messageInput.select()		
+    messageInput.select()
 
-    const formActions = form.createDiv()    
+    const lastCommitDatetime = await executeGitCommand("log -1 --format=%cd", vault)
+    const lastCommitDatetimeLabel = form.createEl("p")
+    lastCommitDatetimeLabel.addClass("setting-item-description")
+    lastCommitDatetimeLabel.setText(`Last async with GitHub: ${new Date(lastCommitDatetime)}`)
+
+    const formActions = form.createDiv()
     formActions.addClass("async-form-actions")
 
     const submitButton = formActions.createEl("button")

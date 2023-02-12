@@ -6,11 +6,13 @@ import { SettingsTab } from "./settings-tab"
 interface PluginSettings {
 	githubRepositoryURL: string;
 	isRepositoryConfigured: boolean;
+	repositoryConfigurationDatetime: Date;
 }
 
 const DEFAULT_SETTINGS: PluginSettings = {
 	githubRepositoryURL: "",
 	isRepositoryConfigured: false,
+	repositoryConfigurationDatetime: new Date(),
 }
 
 export default class AsyncVaultPlugin extends Plugin {

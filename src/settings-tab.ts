@@ -30,6 +30,10 @@ class SettingsTab extends PluginSettingTab {
 		const resultsContainer = containerEl.createDiv()
 		resultsContainer.addClass("async-git-results")		
 
+		const infoContainer = containerEl.createDiv()
+		infoContainer.addClass("async-git-settings-info")
+		infoContainer.addClass("setting-item-description")
+
 		try {
 			await isGitInstalled()
 		} catch (error) {			
@@ -41,7 +45,8 @@ class SettingsTab extends PluginSettingTab {
 			return
 		}
 
-		new Setting(inputsContainer)
+		try {
+			new Setting(inputsContainer)
 			.setName("GitHub repository URL")
 			.setDesc("Public or private. You must to have permissions in this repository")
 			.addText(
@@ -55,44 +60,73 @@ class SettingsTab extends PluginSettingTab {
 						await this.plugin.saveSettings()
 						actionsContainer.toggleClass("visible", true)
 						resultsContainer.toggleClass("visible", false)
+						infoContainer.toggleClass("visible", false)
 					})
 			)
 
-		const submitButton = actionsContainer.createEl("button")
-		submitButton.setText("Configurate repository")
-		submitButton.addClass("mod-cta")
-		submitButton.addEventListener("click", async () => {
-			try {
-				const repository = this.plugin.settings.githubRepositoryURL
+			const submitButton = actionsContainer.createEl("button")
+			submitButton.setText("Configurate repository")
+			submitButton.addClass("mod-cta")
+			submitButton.addEventListener("click", async () => {
+				try {
+					const repository = this.plugin.settings.githubRepositoryURL
 
-				// if remote origin has been added then only update the URL
-				const remoteOrigin = await executeGitCommand("remote -v", vault)
-				const isRemoteOriginAdded = remoteOrigin.contains("origin")
+					// if remote origin has been added then only update the URL
+					const remoteOrigin = await executeGitCommand("remote -v", vault)
+					const isRemoteOriginAdded = remoteOrigin.contains("origin")
 
-				if (isRemoteOriginAdded){
-					await executeGitCommand(`remote set-url origin ${repository}`, vault)
-				} else {
-					// for the first load of the plugin
-					await executeGitCommand(`remote add origin ${repository}`, vault)
+					if (isRemoteOriginAdded){
+						await executeGitCommand(`remote set-url origin ${repository}`, vault)
+					} else {
+						// for the first load of the plugin
+						await executeGitCommand(`remote add origin ${repository}`, vault)
+					}
+
+					// change principal branch to "main"
+					const branchGitResult = await executeGitCommand("branch --show-current", vault)
+					if (branchGitResult.includes("master")) {
+						await executeGitCommand("branch -M main", vault)
+					}
+
+					this.plugin.formatResult("The GitHub repository has been configured", resultsContainer)
+					this.plugin.settings.isRepositoryConfigured = true
+					this.plugin.settings.repositoryConfigurationDatetime = new Date()
+					await this.plugin.saveSettings()
+					actionsContainer.toggleClass("visible", false)
+					infoContainer.toggleClass("visible", true)
+					await this.getInfo(infoContainer, vault)
+				} catch (error) {
+					console.log("try")
+					this.plugin.formatResult(error.message, resultsContainer)
 				}
+			})
 
-				// change principal branch to "main"
-				const branchGitResult = await executeGitCommand("branch --show-current", vault)
-				if (branchGitResult.includes("master")) {
-					await executeGitCommand("branch -M main", vault)
-				}
-
-				this.plugin.formatResult("The GitHub repository has been configured", resultsContainer)
-				this.plugin.settings.isRepositoryConfigured = true
-				actionsContainer.toggleClass("visible", false)
-			} catch (error) {
-				this.plugin.formatResult(error.message, resultsContainer)
+			if (!this.plugin.settings.isRepositoryConfigured) {
+				actionsContainer.toggleClass("visible", true)
 			}
-		})
 
-		if (!this.plugin.settings.isRepositoryConfigured) {
+			if (this.plugin.settings.isRepositoryConfigured) {
+				infoContainer.toggleClass("visible", true)
+				await this.getInfo(infoContainer, vault)
+			}
+		} catch (error) {
+			this.plugin.formatResult(error.message, resultsContainer)
 			actionsContainer.toggleClass("visible", true)
+			this.plugin.settings.isRepositoryConfigured = false
+			await this.plugin.saveSettings()
+			return
 		}
+	}
+
+	async getInfo(infoContainer: HTMLDivElement, vault: string){
+		infoContainer.innerHTML = ""
+		const currentBranch = await executeGitCommand("branch --show-current", vault)
+		const lastCommitDatetime = await executeGitCommand("log -1 --format=%cd", vault)
+		const repositoryConfigurationDatetime = this.plugin.settings.repositoryConfigurationDatetime
+
+		infoContainer.createEl("p").setText(`Current branch: *${currentBranch}`)
+		infoContainer.createEl("p").setText(`Repository configured: ${new Date(repositoryConfigurationDatetime)}`)
+		infoContainer.createEl("p").setText(`Last sync with GitHub: ${lastCommitDatetime}`)
 	}
 }
 
