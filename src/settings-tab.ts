@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian"
 
-import { executeGitCommand, isGitInstalled } from "./git"
+import { executeGitCommand, deleteRepository, isGitInstalled, isRemoteOriginAdded, existCommits } from "./git"
 
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
 // https://www.youtube.com/watch?v=0-8v7XkKiHc
@@ -9,15 +9,15 @@ import type AsyncVaultPlugin from "./main"
 
 class SettingsTab extends PluginSettingTab {
 	plugin: AsyncVaultPlugin
+	vault: string
 
 	constructor(app: App, plugin: AsyncVaultPlugin) {
 		super(app, plugin)
 		this.plugin = plugin
+		this.vault = plugin.getVaultPath()
 	}
 
 	async display(): Promise<void> {
-		const vault = this.plugin.getVaultPath()
-
 		const { containerEl } = this
 		containerEl.empty()
 		containerEl.createEl("h1", { text: "Async vault with GitHub settings" })
@@ -55,7 +55,6 @@ class SettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.githubRepositoryURL)
 					.onChange(async (value: string) => {
 						this.plugin.settings.githubRepositoryURL = value
-						this.plugin.settings.isRepositoryConfigured = false
 
 						await this.plugin.saveSettings()
 						actionsContainer.toggleClass("visible", true)
@@ -69,63 +68,53 @@ class SettingsTab extends PluginSettingTab {
 			submitButton.addClass("mod-cta")
 			submitButton.addEventListener("click", async () => {
 				try {
+					await deleteRepository(this.vault)
+
 					const repository = this.plugin.settings.githubRepositoryURL
 
-					// if remote origin has been added then only update the URL
-					const remoteOrigin = await executeGitCommand("remote -v", vault)
-					const isRemoteOriginAdded = remoteOrigin.contains("origin")
+					await executeGitCommand(`remote add origin ${repository}`, this.vault)
+					await executeGitCommand("branch -M main", this.vault)
 
-					if (isRemoteOriginAdded){
-						await executeGitCommand(`remote set-url origin ${repository}`, vault)
-					} else {
-						// for the first load of the plugin
-						await executeGitCommand(`remote add origin ${repository}`, vault)
-					}
-
-					// change principal branch to "main"
-					const branchGitResult = await executeGitCommand("branch --show-current", vault)
-					if (branchGitResult.includes("master")) {
-						await executeGitCommand("branch -M main", vault)
-					}
-
-					this.plugin.formatResult("The GitHub repository has been configured", resultsContainer)
-					this.plugin.settings.isRepositoryConfigured = true
 					this.plugin.settings.repositoryConfigurationDatetime = new Date()
 					await this.plugin.saveSettings()
+
 					actionsContainer.toggleClass("visible", false)
 					infoContainer.toggleClass("visible", true)
-					await this.getInfo(infoContainer, vault)
+
+					
+					await this.getRepositoryInfo(infoContainer)	
 				} catch (error) {
-					console.log("try")
 					this.plugin.formatResult(error.message, resultsContainer)
 				}
 			})
 
-			if (!this.plugin.settings.isRepositoryConfigured) {
+			if (await isRemoteOriginAdded(this.vault)) {
+				infoContainer.toggleClass("visible", true)
+				await this.getRepositoryInfo(infoContainer)
+			} else {
 				actionsContainer.toggleClass("visible", true)
 			}
-
-			if (this.plugin.settings.isRepositoryConfigured) {
-				infoContainer.toggleClass("visible", true)
-				await this.getInfo(infoContainer, vault)
-			}
 		} catch (error) {
-			this.plugin.formatResult(error.message, resultsContainer)
 			actionsContainer.toggleClass("visible", true)
-			this.plugin.settings.isRepositoryConfigured = false
 			await this.plugin.saveSettings()
-			return
+			this.plugin.formatResult(error.message, resultsContainer)
 		}
 	}
 
-	async getInfo(infoContainer: HTMLDivElement, vault: string){
+	async getRepositoryInfo(infoContainer: HTMLDivElement){
 		infoContainer.innerHTML = ""
-		const currentBranch = await executeGitCommand("branch --show-current", vault)
-		const lastCommitDatetime = await executeGitCommand("log -1 --format=%cd", vault)
-		const repositoryConfigurationDatetime = this.plugin.settings.repositoryConfigurationDatetime
+		infoContainer.toggleClass("visible", true)
 
-		infoContainer.createEl("p").setText(`Current branch: *${currentBranch}`)
-		infoContainer.createEl("p").setText(`Repository configured: ${new Date(repositoryConfigurationDatetime)}`)
+		const currentBranch = await executeGitCommand("branch --show-current", this.vault)
+		const lastCommitDatetime = await existCommits(this.vault)
+			? await executeGitCommand("log -1 --format=%cd", this.vault)
+			: "No commits yet"
+		const repositoryConfigurationDatetime = this.plugin.settings.repositoryConfigurationDatetime
+		const remoteOrigin = await executeGitCommand("config --get remote.origin.url", this.vault)
+
+		infoContainer.createEl("p").setText(`Branch: *${currentBranch}`)		
+		infoContainer.createEl("p").setText(`GitHub repository: ${remoteOrigin}`)
+		infoContainer.createEl("p").setText(`Configuration date: ${new Date(repositoryConfigurationDatetime)}`)
 		infoContainer.createEl("p").setText(`Last sync with GitHub: ${lastCommitDatetime}`)
 	}
 }

@@ -36,6 +36,21 @@ const createRepository = async (vault: string) => {
   }
 }
 
+const deleteRepository = async (vault: string) => {
+  try {
+    // https://stackoverflow.com/questions/7160342/how-to-skip-are-you-sure-y-n-when-deleting-files-in-batch-files
+    const { stdout, stderr } = await _exec(`del /F /Q ${vault}\\.git`)
+
+    if (stderr) {
+      return Promise.reject(stderr)
+    }
+
+    return Promise.resolve(stdout)
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
 const executeGitCommand = async(command: string, vault: string):Promise<string> => {
   try {
     await createRepository(vault)
@@ -48,4 +63,22 @@ const executeGitCommand = async(command: string, vault: string):Promise<string> 
   }
 }
 
-export { isGitInstalled, createRepository, executeGitCommand }
+  const isRemoteOriginAdded = async (vault: string): Promise<boolean> => {
+		try {
+			const remoteOrigin = await executeGitCommand("remote -v", vault)
+			return Promise.resolve(remoteOrigin.contains("origin"))
+		} catch (error) {
+			return Promise.resolve(false)
+		}
+	}
+
+	const existCommits = async (vault: string): Promise<boolean> => {
+		try {
+			await executeGitCommand("log", vault)
+			return Promise.resolve(true)
+		} catch (error) {
+			return Promise.resolve(false)
+		}
+	}
+
+export { isGitInstalled, createRepository, deleteRepository, executeGitCommand, isRemoteOriginAdded, existCommits }
