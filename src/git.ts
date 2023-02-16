@@ -38,8 +38,8 @@ const createRepository = async (vault: string) => {
 
 const deleteRepository = async (vault: string) => {
   try {
-    // https://stackoverflow.com/questions/7160342/how-to-skip-are-you-sure-y-n-when-deleting-files-in-batch-files
-    const { stdout, stderr } = await _exec(`del /F /Q ${vault}\\.git`)
+    // https://stackoverflow.com/questions/17369850/how-to-remove-git-repository-created-on-desktop
+    const { stdout, stderr } = await _exec(`rmdir /s /q ${vault}\\.git`)
 
     if (stderr) {
       return Promise.reject(stderr)
