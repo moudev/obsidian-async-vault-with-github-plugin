@@ -52,18 +52,6 @@ class AsyncModal extends Modal {
       form.type = "submit"
       form.toggleClass("visible", true)
       form.createEl("label").setText("Commit message:")
-      form.onsubmit = async (e) => {
-        try {
-          e.preventDefault()
-          const gitAdd = await executeGitCommand("add .", this.vault)
-          const gitCommit = await executeGitCommand(`commit -m "${messageInput.value}"`, this.vault)
-          const gitPush = await executeGitCommand("push -f origin main", this.vault)
-          this.plugin.formatResult(`${gitAdd} ${gitCommit} ${gitPush}`, resultsContainer)
-        } catch (error) {
-          // TODO: if fails remove the commit. Reset soft
-          this.plugin.formatResult(error.message, resultsContainer)
-        }
-      }
   
       const messageInput = form.createEl("input")
       messageInput.type = "text"
@@ -80,7 +68,11 @@ class AsyncModal extends Modal {
   
       const formActions = form.createDiv()
       formActions.addClass("async-form-actions")
-  
+
+      const formMessages = form.createDiv()
+      formMessages.addClass("async-form-messages")
+      formMessages.createSpan().setText("Success. The vault has been sync with GitHub")
+
       const submitButton = formActions.createEl("button")
       submitButton.setText("Submit")
       submitButton.addClass("mod-cta")
@@ -89,6 +81,32 @@ class AsyncModal extends Modal {
       if (existModifiedOrNewFiles.includes("md")) {
         this.plugin.formatResult(existModifiedOrNewFiles, resultsContainer, true)
         formActions.toggleClass("visible", true)
+      } else {
+        this.plugin.formatResult("There is no changes to sync with GitHub", resultsContainer)
+      }
+
+      form.onsubmit = async (e) => {
+        try {
+          e.preventDefault()
+          submitButton.setText("processing...")
+          submitButton.setAttr("disabled", true)
+          submitButton.toggleClass("disabled", true)
+
+          const gitAdd = await executeGitCommand("add .", this.vault)
+          const gitCommit = await executeGitCommand(`commit -m "${messageInput.value}"`, this.vault)
+          const gitPush = await executeGitCommand("push -f origin main", this.vault)
+          this.plugin.formatResult(`${gitAdd} ${gitCommit} ${gitPush}`, resultsContainer)
+
+          formActions.toggleClass("visible", false)
+          formMessages.toggleClass("visible", true)
+          const newLastCommitDatetime = new Date(await executeGitCommand("log -1 --format=%cd", this.vault))
+          lastCommitDatetimeLabel.setText(`Last async with GitHub: ${newLastCommitDatetime}`)
+        } catch (error) {
+          submitButton.setText("Submit")
+          submitButton.setAttr("disabled", false)
+          submitButton.toggleClass("disabled", false)
+          this.plugin.formatResult(error.message, resultsContainer)
+        }
       }
     } catch (error) {
       this.plugin.formatResult(error.message, resultsContainer)

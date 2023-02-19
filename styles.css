@@ -35,6 +35,16 @@ If your plugin does not need CSS, delete this file.
   display: flex;
 }
 
+.async-form-messages {
+  display: none;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.async-form-messages.visible {
+  display: flex;
+}
+
 .async-git-results {
   display: none;
   flex-direction: column;  
@@ -92,4 +102,9 @@ If your plugin does not need CSS, delete this file.
 
 .async-git-settings-info.visible {
   display: flex;
+}
+
+button.mod-cta.disabled {
+  color: var(--text-muted);
+  opacity: 0.4
 }
