@@ -48,6 +48,18 @@ If your plugin does not need CSS, delete this file.
   max-height: 300px;
 }
 
+.async-git-results .add-or-change {
+  color: #29691F;
+}
+
+.async-git-results .remove {
+  color: #C45332;
+}
+
+.async-git-results .new {
+  color: #58A6FF;
+}
+
 .async-git-results.visible {
   display: flex;
 }

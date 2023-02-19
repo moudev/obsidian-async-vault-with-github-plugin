@@ -47,7 +47,7 @@ export default class AsyncVaultPlugin extends Plugin {
 		return ""
 	}
 
-	formatResult(result: string, container: HTMLElement) {
+	formatResult(result: string, container: HTMLElement, checkFilesStatus = false) {
     container.innerHTML = ""
   
     if (!result) {
@@ -57,9 +57,32 @@ export default class AsyncVaultPlugin extends Plugin {
 		container.toggleClass("visible", true)
 
     const chunks = result.split("\n")
-    chunks.forEach(text => {
-      if (text) {
-        container.createEl("p").setText(text)
+    chunks.forEach(rawText => {
+			const text = rawText.trim().toLowerCase()
+
+      if (text && !text.includes("will be replaced by") && !text.includes("will have its original line endings")) {
+				// only for show the files of git status
+				if (checkFilesStatus) {
+					if (text.startsWith("modified") || text.startsWith("deleted") || text.endsWith(".md")) {
+						const line = container.createEl("p")
+						line.setText(text)
+
+						if (text.startsWith("deleted") ) {
+							line.addClass("remove")
+						}
+						else if(text.startsWith("modified")) {
+							line.addClass("add-or-change")
+						}
+						else if(text.endsWith(".md")) {
+							line.addClass("new")
+						}
+					}
+					return
+				}
+
+				// when it's not about git status; errors, etc
+				const line = container.createEl("p")
+				line.setText(text)
       }
     })
   }

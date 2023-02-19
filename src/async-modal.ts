@@ -50,16 +50,17 @@ class AsyncModal extends Modal {
   
       form.addClass("async-form")
       form.type = "submit"
+      form.toggleClass("visible", true)
       form.createEl("label").setText("Commit message:")
       form.onsubmit = async (e) => {
         try {
           e.preventDefault()
           const gitAdd = await executeGitCommand("add .", this.vault)
           const gitCommit = await executeGitCommand(`commit -m "${messageInput.value}"`, this.vault)
-          const gitPush = await executeGitCommand("push origin main", this.vault)
+          const gitPush = await executeGitCommand("push -f origin main", this.vault)
           this.plugin.formatResult(`${gitAdd} ${gitCommit} ${gitPush}`, resultsContainer)
-          this.plugin.formatResult(`${gitAdd} asdf`, resultsContainer)
         } catch (error) {
+          // TODO: if fails remove the commit. Reset soft
           this.plugin.formatResult(error.message, resultsContainer)
         }
       }
@@ -83,9 +84,12 @@ class AsyncModal extends Modal {
       const submitButton = formActions.createEl("button")
       submitButton.setText("Submit")
       submitButton.addClass("mod-cta")
-  
-      formActions.toggleClass("visible", true)
-      form.toggleClass("visible", true)
+
+      const existModifiedOrNewFiles = await executeGitCommand("status", this.vault)
+      if (existModifiedOrNewFiles.includes("md")) {
+        this.plugin.formatResult(existModifiedOrNewFiles, resultsContainer, true)
+        formActions.toggleClass("visible", true)
+      }
     } catch (error) {
       this.plugin.formatResult(error.message, resultsContainer)
     }
