@@ -52,14 +52,21 @@ class SettingsTab extends PluginSettingTab {
 			.addText(
 				text => text
 					.setPlaceholder("Repository url")
-					.setValue(this.plugin.settings.githubRepositoryURL)
+					.setValue(this.plugin.settings.previousGithubRepository)
 					.onChange(async (value: string) => {
 						this.plugin.settings.githubRepositoryURL = value
 
 						await this.plugin.saveSettings()
-						actionsContainer.toggleClass("visible", true)
+
+						if (this.plugin.settings.githubRepositoryURL != this.plugin.settings.previousGithubRepository) {
+							actionsContainer.toggleClass("visible", true)
+							infoContainer.toggleClass("visible", false)
+						} else {
+							actionsContainer.toggleClass("visible", false)
+							infoContainer.toggleClass("visible", true)
+						}
+
 						resultsContainer.toggleClass("visible", false)
-						infoContainer.toggleClass("visible", false)
 					})
 			)
 
@@ -76,12 +83,12 @@ class SettingsTab extends PluginSettingTab {
 					await executeGitCommand("branch -M main", this.vault)
 
 					this.plugin.settings.repositoryConfigurationDatetime = new Date()
+					this.plugin.settings.previousGithubRepository = repository
 					await this.plugin.saveSettings()
 
 					actionsContainer.toggleClass("visible", false)
 					infoContainer.toggleClass("visible", true)
 
-					
 					await this.getRepositoryInfo(infoContainer)	
 				} catch (error) {
 					this.plugin.formatResult(error.message, resultsContainer)

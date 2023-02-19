@@ -4,14 +4,14 @@ import { AsyncModal } from "./async-modal"
 import { SettingsTab } from "./settings-tab"
 
 interface PluginSettings {
+	previousGithubRepository: string;
 	githubRepositoryURL: string;
-	isRepositoryConfigured: boolean;
 	repositoryConfigurationDatetime: Date;
 }
 
 const DEFAULT_SETTINGS: PluginSettings = {
+	previousGithubRepository: "",
 	githubRepositoryURL: "",
-	isRepositoryConfigured: false,
 	repositoryConfigurationDatetime: new Date(),
 }
 
