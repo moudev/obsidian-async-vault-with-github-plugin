@@ -2,9 +2,15 @@
 // https://github.com/pluvial/svelte-adapter-deno/issues/14#issuecomment-987225812
 // https://esbuild.github.io/api/#external in "js" tab
 import { exec } from "node:child_process"
+import { platform } from "node:os"
 import { promisify } from "node:util"
 
 const _exec = promisify(exec)
+
+// https://github.com/Taitava/obsidian-shellcommands/blob/627d3b4a36300654bf32c7afe0aea1b24c77351f/src/Common.ts#L69
+const isWindows = () => {
+  return platform() === "win32"
+}
 
 const isGitInstalled = async () => {
   try {
@@ -38,8 +44,9 @@ const createRepository = async (vault: string) => {
 
 const deleteRepository = async (vault: string) => {
   try {
-    // https://stackoverflow.com/questions/17369850/how-to-remove-git-repository-created-on-desktop
-    const { stdout, stderr } = await _exec(`rmdir /s /q ${vault}\\.git`)
+    // for windows: https://stackoverflow.com/questions/17369850/how-to-remove-git-repository-created-on-desktop
+    const commandString = isWindows() ? `rmdir /s /q ${vault}\\.git` : `rm -rf ${vault}/.git`
+    const { stdout, stderr } = await _exec(commandString)
 
     if (stderr) {
       return Promise.reject(stderr)
