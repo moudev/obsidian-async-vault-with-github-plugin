@@ -99,6 +99,7 @@ class AsyncModal extends Modal {
 
           formActions.toggleClass("visible", false)
           formMessages.toggleClass("visible", true)
+
           const newLastCommitDatetime = new Date(await executeGitCommand("log -1 --format=%cd", this.vault))
           lastCommitDatetimeLabel.setText(`Last async with GitHub: ${newLastCommitDatetime}`)
         } catch (error) {

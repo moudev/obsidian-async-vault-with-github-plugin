@@ -27,6 +27,10 @@ class SettingsTab extends PluginSettingTab {
 		const actionsContainer = containerEl.createDiv()
 		actionsContainer.addClass("async-git-config-actions")
 
+		const messagesContainer = containerEl.createDiv()
+		messagesContainer.addClass("async-git-config-messages")
+		messagesContainer.createSpan().setText("Success. The vault has been configured with GitHub")
+
 		const resultsContainer = containerEl.createDiv()
 		resultsContainer.addClass("async-git-results")		
 
@@ -36,7 +40,7 @@ class SettingsTab extends PluginSettingTab {
 
 		try {
 			await isGitInstalled()
-		} catch (error) {			
+		} catch (error) {
 			this.plugin.formatResult(error, resultsContainer)
 			resultsContainer.createEl("h2", { text: "Error: Make sure that git is installed and configurated with your GitHub credentials." })
 			resultsContainer.createEl("a", { text: "Install git" }).setAttr("href", "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git")
@@ -54,6 +58,8 @@ class SettingsTab extends PluginSettingTab {
 					.setPlaceholder("Repository url")
 					.setValue(this.plugin.settings.previousGithubRepository)
 					.onChange(async (value: string) => {
+						messagesContainer.toggleClass("visible", false)
+
 						this.plugin.settings.githubRepositoryURL = value
 
 						await this.plugin.saveSettings()
@@ -75,6 +81,10 @@ class SettingsTab extends PluginSettingTab {
 			submitButton.addClass("mod-cta")
 			submitButton.addEventListener("click", async () => {
 				try {
+					submitButton.setText("processing...")
+					submitButton.setAttr("disabled", true)
+					submitButton.toggleClass("disabled", true)
+
 					await deleteRepository(this.vault)
 
 					const repository = this.plugin.settings.githubRepositoryURL
@@ -88,9 +98,16 @@ class SettingsTab extends PluginSettingTab {
 
 					actionsContainer.toggleClass("visible", false)
 					infoContainer.toggleClass("visible", true)
+					messagesContainer.toggleClass("visible", true)
+					submitButton.setText("Configurate repository")
+          submitButton.removeAttribute("disabled")
+          submitButton.toggleClass("disabled", false)
 
-					await this.getRepositoryInfo(infoContainer)	
+					await this.getRepositoryInfo(infoContainer)
 				} catch (error) {
+					submitButton.setText("Configurate repository")
+          submitButton.removeAttribute("disabled")
+          submitButton.toggleClass("disabled", false)
 					this.plugin.formatResult(error.message, resultsContainer)
 				}
 			})
