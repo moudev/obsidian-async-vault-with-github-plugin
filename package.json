@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-async-vault-with-github-plugin",
+	"name": "obsidian-sync-vault-with-github-plugin",
 	"version": "0.0.1",
 	"description": "Create a backup of the vault and sync it with a GitHub repository",
 	"main": "main.js",

@@ -5,13 +5,13 @@ import { executeGitCommand, deleteRepository, isGitInstalled, isRemoteOriginAdde
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
 // https://www.youtube.com/watch?v=0-8v7XkKiHc
 // https://devblogs.microsoft.com/typescript/announcing-typescript-3-8-beta/#type-only-imports-exports
-import type AsyncVaultPlugin from "./main"
+import type SyncVaultPlugin from "./main"
 
 class SettingsTab extends PluginSettingTab {
-	plugin: AsyncVaultPlugin
+	plugin: SyncVaultPlugin
 	vault: string
 
-	constructor(app: App, plugin: AsyncVaultPlugin) {
+	constructor(app: App, plugin: SyncVaultPlugin) {
 		super(app, plugin)
 		this.plugin = plugin
 		this.vault = plugin.getVaultPath()
@@ -20,22 +20,22 @@ class SettingsTab extends PluginSettingTab {
 	async display(): Promise<void> {
 		const { containerEl } = this
 		containerEl.empty()
-		containerEl.createEl("h1", { text: "Async vault with GitHub settings" })
+		containerEl.createEl("h1", { text: "Sync vault with GitHub settings" })
 
 		const inputsContainer = containerEl.createDiv()
 
 		const actionsContainer = containerEl.createDiv()
-		actionsContainer.addClass("async-git-config-actions")
+		actionsContainer.addClass("sync-git-config-actions")
 
 		const messagesContainer = containerEl.createDiv()
-		messagesContainer.addClass("async-git-config-messages")
+		messagesContainer.addClass("sync-git-config-messages")
 		messagesContainer.createSpan().setText("Success. The vault has been configured with GitHub")
 
 		const resultsContainer = containerEl.createDiv()
-		resultsContainer.addClass("async-git-results")		
+		resultsContainer.addClass("sync-git-results")		
 
 		const infoContainer = containerEl.createDiv()
-		infoContainer.addClass("async-git-settings-info")
+		infoContainer.addClass("sync-git-settings-info")
 		infoContainer.addClass("setting-item-description")
 
 		try {

@@ -5,30 +5,30 @@ import { executeGitCommand, isGitInstalled, isRemoteOriginAdded, existCommits } 
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
 // https://www.youtube.com/watch?v=0-8v7XkKiHc
 // https://devblogs.microsoft.com/typescript/announcing-typescript-3-8-beta/#type-only-imports-exports
-import type AsyncVaultPlugin from "./main"
+import type SyncVaultPlugin from "./main"
 
 // https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/1.8.12/src/dialogs/Prompt.ts#L18
-class AsyncModal extends Modal {
+class SyncModal extends Modal {
 	defaultCommitMessage: string
-  plugin: AsyncVaultPlugin
+  plugin: SyncVaultPlugin
   vault: string
 
-  constructor(app: App, plugin: AsyncVaultPlugin) {
+  constructor(app: App, plugin: SyncVaultPlugin) {
     super(app)
-		this.defaultCommitMessage = `async from ${new Date()}`
+		this.defaultCommitMessage = `sync from ${new Date()}`
     this.plugin = plugin
     this.vault = plugin.getVaultPath()
   }
 
   async onOpen() {
     const { contentEl } = this
-    contentEl.createEl("h1", { text: "Async vault with GitHub" })
+    contentEl.createEl("h1", { text: "Sync vault with GitHub" })
 
     const formContainer = contentEl.createDiv()
 		const form = formContainer.createEl("form")
 
     const resultsContainer = contentEl.createDiv()
-    resultsContainer.addClass("async-git-results")
+    resultsContainer.addClass("sync-git-results")
 
     try {
 			await isGitInstalled()
@@ -48,7 +48,7 @@ class AsyncModal extends Modal {
         return
       }
   
-      form.addClass("async-form")
+      form.addClass("sync-form")
       form.type = "submit"
       form.toggleClass("visible", true)
       form.createEl("label").setText("Commit message:")
@@ -64,13 +64,13 @@ class AsyncModal extends Modal {
         : "No commits yet"
       const lastCommitDatetimeLabel = form.createEl("p")
       lastCommitDatetimeLabel.addClass("setting-item-description")
-      lastCommitDatetimeLabel.setText(`Last async with GitHub: ${lastCommitDatetime}`)
+      lastCommitDatetimeLabel.setText(`Last sync with GitHub: ${lastCommitDatetime}`)
   
       const formActions = form.createDiv()
-      formActions.addClass("async-form-actions")
+      formActions.addClass("sync-form-actions")
 
       const formMessages = form.createDiv()
-      formMessages.addClass("async-form-messages")
+      formMessages.addClass("sync-form-messages")
       formMessages.createSpan().setText("Success. The vault has been sync with GitHub")
 
       const submitButton = formActions.createEl("button")
@@ -101,7 +101,7 @@ class AsyncModal extends Modal {
           formMessages.toggleClass("visible", true)
 
           const newLastCommitDatetime = new Date(await executeGitCommand("log -1 --format=%cd", this.vault))
-          lastCommitDatetimeLabel.setText(`Last async with GitHub: ${newLastCommitDatetime}`)
+          lastCommitDatetimeLabel.setText(`Last sync with GitHub: ${newLastCommitDatetime}`)
         } catch (error) {
           submitButton.setText("Submit")
           submitButton.setAttr("disabled", false)
@@ -120,4 +120,4 @@ class AsyncModal extends Modal {
   }
 }
 
-export { AsyncModal } 
+export { SyncModal } 

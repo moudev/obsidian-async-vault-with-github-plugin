@@ -1,6 +1,6 @@
 import { Plugin, FileSystemAdapter } from "obsidian"
 
-import { AsyncModal } from "./async-modal"
+import { SyncModal } from "./sync-modal"
 import { SettingsTab } from "./settings-tab"
 
 interface PluginSettings {
@@ -15,14 +15,14 @@ const DEFAULT_SETTINGS: PluginSettings = {
 	repositoryConfigurationDatetime: new Date(),
 }
 
-export default class AsyncVaultPlugin extends Plugin {
+export default class SyncVaultPlugin extends Plugin {
 	settings: PluginSettings
 
 	async onload() {
 		await this.loadSettings()
 
-		this.addRibbonIcon("refresh-cw", "Async vault with GitHub", async () => {
-			new AsyncModal(this.app, this).open()
+		this.addRibbonIcon("refresh-cw", "Sync vault with GitHub", async () => {
+			new SyncModal(this.app, this).open()
 		})
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
