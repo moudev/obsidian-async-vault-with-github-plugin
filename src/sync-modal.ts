@@ -1,6 +1,7 @@
 import { App, Modal } from "obsidian"
 
 import { executeGitCommand, isGitInstalled, isRemoteOriginAdded, existCommits } from "./git"
+import { labels } from "./labels"
 
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
 // https://www.youtube.com/watch?v=0-8v7XkKiHc
@@ -15,14 +16,14 @@ class SyncModal extends Modal {
 
   constructor(app: App, plugin: SyncVaultPlugin) {
     super(app)
-		this.defaultCommitMessage = `sync from ${new Date()}`
+		this.defaultCommitMessage = labels.defaultCommit
     this.plugin = plugin
     this.vault = plugin.getVaultPath()
   }
 
   async onOpen() {
     const { contentEl } = this
-    contentEl.createEl("h1", { text: "Sync vault with GitHub" })
+    contentEl.createEl("h1", { text: labels.syncModalTitle })
 
     const formContainer = contentEl.createDiv()
 		const form = formContainer.createEl("form")
@@ -34,24 +35,24 @@ class SyncModal extends Modal {
 			await isGitInstalled()
 		} catch (error) {
 			this.plugin.formatResult(error, resultsContainer)
-			resultsContainer.createEl("h4", { text: "Error: Make sure that git is installed and configurated with your GitHub credentials." })
-			resultsContainer.createEl("a", { text: "Install git" }).setAttr("href", "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git")
-			resultsContainer.createEl("a", { text: "Create GitHub account" }).setAttr("href", "https://github.com")
-			resultsContainer.createEl("a", { text: "Configurate git with GitHub credentials" }).setAttr("href", "https://docs.github.com/en/get-started/quickstart/set-up-git")
+			resultsContainer.createEl("h4", { text: labels.checkIfGitIsInstalledHint })
+			resultsContainer.createEl("a", { text: labels.installGitHint }).setAttr("href", "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git")
+			resultsContainer.createEl("a", { text: labels.createGitHubAccountHint }).setAttr("href", "https://github.com")
+			resultsContainer.createEl("a", { text: labels.configureGitCredentialsHint }).setAttr("href", "https://docs.github.com/en/get-started/quickstart/set-up-git")
 			return
 		}
 
     try {
       if (!await isRemoteOriginAdded(this.vault)) {
         this.plugin.formatResult("", resultsContainer)
-        resultsContainer.createEl("strong", { text: "Error: Make sure that GitHub repository is configured in plugin settings tab." })
+        resultsContainer.createEl("strong", { text: labels.originRepositoryNotAdded })
         return
       }
   
       form.addClass("sync-form")
       form.type = "submit"
       form.toggleClass("visible", true)
-      form.createEl("label").setText("Commit message:")
+      form.createEl("label").setText(labels.syncModalInputLabel)
   
       const messageInput = form.createEl("input")
       messageInput.type = "text"
@@ -61,20 +62,20 @@ class SyncModal extends Modal {
   
       const lastCommitDatetime = await existCommits(this.vault)
         ? new Date(await executeGitCommand("log -1 --format=%cd", this.vault))
-        : "No commits yet"
+        : labels.noCommits
       const lastCommitDatetimeLabel = form.createEl("p")
       lastCommitDatetimeLabel.addClass("setting-item-description")
-      lastCommitDatetimeLabel.setText(`Last sync with GitHub: ${lastCommitDatetime}`)
+      lastCommitDatetimeLabel.setText(`${labels.lastSync} ${lastCommitDatetime}`)
   
       const formActions = form.createDiv()
       formActions.addClass("sync-form-actions")
 
       const formMessages = form.createDiv()
       formMessages.addClass("sync-form-messages")
-      formMessages.createSpan().setText("Success. The vault has been sync with GitHub")
+      formMessages.createSpan().setText(labels.originRepositoryAddedSuccess)
 
       const submitButton = formActions.createEl("button")
-      submitButton.setText("Submit")
+      submitButton.setText(labels.syncModalSubmitButton)
       submitButton.addClass("mod-cta")
 
       const existModifiedOrNewFiles = await executeGitCommand("status", this.vault)
@@ -82,13 +83,13 @@ class SyncModal extends Modal {
         this.plugin.formatResult(existModifiedOrNewFiles, resultsContainer, true)
         formActions.toggleClass("visible", true)
       } else {
-        this.plugin.formatResult("There is no changes to sync with GitHub", resultsContainer)
+        this.plugin.formatResult(labels.noChangesToSync, resultsContainer)
       }
 
       form.onsubmit = async (e) => {
         try {
           e.preventDefault()
-          submitButton.setText("processing...")
+          submitButton.setText(labels.processing)
           submitButton.setAttr("disabled", true)
           submitButton.toggleClass("disabled", true)
 
@@ -101,9 +102,9 @@ class SyncModal extends Modal {
           formMessages.toggleClass("visible", true)
 
           const newLastCommitDatetime = new Date(await executeGitCommand("log -1 --format=%cd", this.vault))
-          lastCommitDatetimeLabel.setText(`Last sync with GitHub: ${newLastCommitDatetime}`)
+          lastCommitDatetimeLabel.setText(`${labels.lastSync} ${newLastCommitDatetime}`)
         } catch (error) {
-          submitButton.setText("Submit")
+          submitButton.setText(labels.syncModalSubmitButton)
           submitButton.setAttr("disabled", false)
           submitButton.toggleClass("disabled", false)
           this.plugin.formatResult(error.message, resultsContainer)

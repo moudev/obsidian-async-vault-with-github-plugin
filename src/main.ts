@@ -2,6 +2,7 @@ import { Plugin, FileSystemAdapter } from "obsidian"
 
 import { SyncModal } from "./sync-modal"
 import { SettingsTab } from "./settings-tab"
+import { labels } from "./labels"
 
 interface PluginSettings {
 	previousGithubRepository: string;
@@ -21,7 +22,7 @@ export default class SyncVaultPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings()
 
-		this.addRibbonIcon("refresh-cw", "Sync vault with GitHub", async () => {
+		this.addRibbonIcon("refresh-cw", labels.ribbonIcon, async () => {
 			new SyncModal(this.app, this).open()
 		})
 

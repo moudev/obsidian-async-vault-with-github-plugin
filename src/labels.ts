@@ -1,0 +1,27 @@
+const labels = {
+  ribbonIcon: "Sync vault with GitHub",
+  defaultCommit: `sync from ${new Date()}`,
+  syncModalTitle: "Sync vault with GitHub",
+  syncModalInputLabel: "Commit message:",
+  syncModalSubmitButton: "Submit",
+  lastSync: "Last sync with GitHub:",
+  noChangesToSync: "There is no changes to sync with GitHub",
+  originRepositoryAddedSuccess: "Success. The vault has been sync with GitHub",
+  originRepositoryNotAdded: "Error: Make sure that GitHub repository is configured in plugin settings tab.",
+  processing: "processing...",
+  noCommits: "No commits yet",
+  installGitHint: "Install git",
+  createGitHubAccountHint: "Create GitHub account",
+  configureGitCredentialsHint: "Configure git with GitHub credentials",
+  checkIfGitIsInstalledHint: "Error: Make sure that git is installed and configure with your GitHub credentials.",
+  settingsTitle: "Sync vault with GitHub",
+  settingsInputLabel: "GitHub repository URL",
+  settingsInputPlaceholder: "Repository url",
+  settingsInputDescription: "Public or private. You must to have permissions in this repository",
+  settingsSubmitButton: "Configure repository",
+  infoRepositoryBranch: "Branch:",
+  infoRepositoryGitHubLink: "GitHub repository:",
+  infoRepositoryConfigurationDatetime: "Configuration date:",
+}
+
+export { labels }

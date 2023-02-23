@@ -1,6 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian"
 
 import { executeGitCommand, deleteRepository, isGitInstalled, isRemoteOriginAdded, existCommits } from "./git"
+import { labels } from "./labels"
 
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
 // https://www.youtube.com/watch?v=0-8v7XkKiHc
@@ -20,7 +21,7 @@ class SettingsTab extends PluginSettingTab {
 	async display(): Promise<void> {
 		const { containerEl } = this
 		containerEl.empty()
-		containerEl.createEl("h1", { text: "Sync vault with GitHub settings" })
+		containerEl.createEl("h1", { text: labels.settingsTitle })
 
 		const inputsContainer = containerEl.createDiv()
 
@@ -29,7 +30,7 @@ class SettingsTab extends PluginSettingTab {
 
 		const messagesContainer = containerEl.createDiv()
 		messagesContainer.addClass("sync-git-config-messages")
-		messagesContainer.createSpan().setText("Success. The vault has been configured with GitHub")
+		messagesContainer.createSpan().setText(labels.originRepositoryAddedSuccess)
 
 		const resultsContainer = containerEl.createDiv()
 		resultsContainer.addClass("sync-git-results")		
@@ -42,20 +43,20 @@ class SettingsTab extends PluginSettingTab {
 			await isGitInstalled()
 		} catch (error) {
 			this.plugin.formatResult(error, resultsContainer)
-			resultsContainer.createEl("h2", { text: "Error: Make sure that git is installed and configurated with your GitHub credentials." })
-			resultsContainer.createEl("a", { text: "Install git" }).setAttr("href", "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git")
-			resultsContainer.createEl("a", { text: "Create GitHub account" }).setAttr("href", "https://github.com")
-			resultsContainer.createEl("a", { text: "Configurate git with GitHub credentials" }).setAttr("href", "https://docs.github.com/en/get-started/quickstart/set-up-git")
+			resultsContainer.createEl("h2", { text: labels.checkIfGitIsInstalledHint })
+			resultsContainer.createEl("a", { text: labels.installGitHint }).setAttr("href", "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git")
+			resultsContainer.createEl("a", { text: labels.createGitHubAccountHint }).setAttr("href", "https://github.com")
+			resultsContainer.createEl("a", { text: labels.configureGitCredentialsHint }).setAttr("href", "https://docs.github.com/en/get-started/quickstart/set-up-git")
 			return
 		}
 
 		try {
 			new Setting(inputsContainer)
-			.setName("GitHub repository URL")
-			.setDesc("Public or private. You must to have permissions in this repository")
+			.setName(labels.settingsInputLabel)
+			.setDesc(labels.settingsInputDescription)
 			.addText(
 				text => text
-					.setPlaceholder("Repository url")
+					.setPlaceholder(labels.settingsInputPlaceholder)
 					.setValue(this.plugin.settings.previousGithubRepository)
 					.onChange(async (value: string) => {
 						messagesContainer.toggleClass("visible", false)
@@ -77,11 +78,11 @@ class SettingsTab extends PluginSettingTab {
 			)
 
 			const submitButton = actionsContainer.createEl("button")
-			submitButton.setText("Configurate repository")
+			submitButton.setText(labels.settingsSubmitButton)
 			submitButton.addClass("mod-cta")
 			submitButton.addEventListener("click", async () => {
 				try {
-					submitButton.setText("processing...")
+					submitButton.setText(labels.processing)
 					submitButton.setAttr("disabled", true)
 					submitButton.toggleClass("disabled", true)
 
@@ -99,13 +100,13 @@ class SettingsTab extends PluginSettingTab {
 					actionsContainer.toggleClass("visible", false)
 					infoContainer.toggleClass("visible", true)
 					messagesContainer.toggleClass("visible", true)
-					submitButton.setText("Configurate repository")
+					submitButton.setText(labels.settingsSubmitButton)
           submitButton.removeAttribute("disabled")
           submitButton.toggleClass("disabled", false)
 
 					await this.getRepositoryInfo(infoContainer)
 				} catch (error) {
-					submitButton.setText("Configurate repository")
+					submitButton.setText(labels.settingsSubmitButton)
           submitButton.removeAttribute("disabled")
           submitButton.toggleClass("disabled", false)
 					this.plugin.formatResult(error.message, resultsContainer)
@@ -132,14 +133,14 @@ class SettingsTab extends PluginSettingTab {
 		const currentBranch = await executeGitCommand("branch --show-current", this.vault)
 		const lastCommitDatetime = await existCommits(this.vault)
 			? await executeGitCommand("log -1 --format=%cd", this.vault)
-			: "No commits yet"
+			: labels.noCommits
 		const repositoryConfigurationDatetime = this.plugin.settings.repositoryConfigurationDatetime
 		const remoteOrigin = await executeGitCommand("config --get remote.origin.url", this.vault)
 
-		infoContainer.createEl("p").setText(`Branch: *${currentBranch}`)		
-		infoContainer.createEl("p").setText(`GitHub repository: ${remoteOrigin}`)
-		infoContainer.createEl("p").setText(`Configuration date: ${new Date(repositoryConfigurationDatetime)}`)
-		infoContainer.createEl("p").setText(`Last sync with GitHub: ${lastCommitDatetime}`)
+		infoContainer.createEl("p").setText(`${labels.infoRepositoryBranch} *${currentBranch}`)		
+		infoContainer.createEl("p").setText(`${labels.infoRepositoryGitHubLink} ${remoteOrigin}`)
+		infoContainer.createEl("p").setText(`${labels.infoRepositoryConfigurationDatetime} ${new Date(repositoryConfigurationDatetime)}`)
+		infoContainer.createEl("p").setText(`${labels.lastSync} ${lastCommitDatetime}`)
 	}
 }
 
