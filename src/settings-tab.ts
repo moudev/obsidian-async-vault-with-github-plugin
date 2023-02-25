@@ -1,6 +1,13 @@
 import { App, PluginSettingTab, Setting } from "obsidian"
 
-import { executeGitCommand, deleteRepository, isGitInstalled, isRemoteOriginAdded, existCommits } from "./git"
+import {
+	executeGitCommand,
+	deleteRepository,
+	isGitInstalled,
+	isRemoteOriginAdded,
+	existCommits,
+	createGitIgnore,
+} from "./git"
 import { labels } from "./labels"
 
 // https://github.com/liamcain/obsidian-calendar-plugin/blob/master/src/settings.ts#L7
@@ -24,9 +31,33 @@ class SettingsTab extends PluginSettingTab {
 		containerEl.createEl("h1", { text: labels.settingsTitle })
 
 		const inputsContainer = containerEl.createDiv()
+		inputsContainer.addClass("sync-git-config-inputs")
 
 		const actionsContainer = containerEl.createDiv()
 		actionsContainer.addClass("sync-git-config-actions")
+
+		const ignoreFilesContainer = containerEl.createDiv()
+		ignoreFilesContainer.addClass("sync-git-config-ignore-files")
+		ignoreFilesContainer.addClass("visible")
+		new Setting(ignoreFilesContainer)
+			.setName(labels.settingsIgnoreFilesLabel)
+			.setDesc(labels.settingsIgnoreFilesDescription)
+			.addTextArea(
+				text => text
+					.setPlaceholder(labels.settingsIgnoreFilesPlaceholder)
+					.setValue(this.plugin.settings.filesToIgnore)
+					.onChange(async (value: string) => {
+						try {
+							messagesContainer.toggleClass("visible", false)
+							this.plugin.settings.filesToIgnore = value	
+							await createGitIgnore(this.vault, value)
+
+							await this.plugin.saveSettings()
+						} catch (error) {
+							this.plugin.formatResult(error.message, resultsContainer)
+						}
+					})
+			)
 
 		const messagesContainer = containerEl.createDiv()
 		messagesContainer.addClass("sync-git-config-messages")
@@ -68,9 +99,11 @@ class SettingsTab extends PluginSettingTab {
 						if (this.plugin.settings.githubRepositoryURL != this.plugin.settings.previousGithubRepository) {
 							actionsContainer.toggleClass("visible", true)
 							infoContainer.toggleClass("visible", false)
+							ignoreFilesContainer.toggleClass("visible", false)
 						} else {
 							actionsContainer.toggleClass("visible", false)
 							infoContainer.toggleClass("visible", true)
+							ignoreFilesContainer.toggleClass("visible", true)
 						}
 
 						resultsContainer.toggleClass("visible", false)
@@ -95,10 +128,12 @@ class SettingsTab extends PluginSettingTab {
 
 					this.plugin.settings.repositoryConfigurationDatetime = new Date()
 					this.plugin.settings.previousGithubRepository = repository
+					this.plugin.settings.filesToIgnore = ""
 					await this.plugin.saveSettings()
 
 					actionsContainer.toggleClass("visible", false)
 					infoContainer.toggleClass("visible", true)
+					ignoreFilesContainer.toggleClass("visible", true)
 					messagesContainer.toggleClass("visible", true)
 					submitButton.setText(labels.settingsSubmitButton)
           submitButton.removeAttribute("disabled")
@@ -115,6 +150,7 @@ class SettingsTab extends PluginSettingTab {
 
 			if (await isRemoteOriginAdded(this.vault)) {
 				infoContainer.toggleClass("visible", true)
+				ignoreFilesContainer.toggleClass("visible", true)
 				await this.getRepositoryInfo(infoContainer)
 			} else {
 				actionsContainer.toggleClass("visible", true)

@@ -8,12 +8,14 @@ interface PluginSettings {
 	previousGithubRepository: string;
 	githubRepositoryURL: string;
 	repositoryConfigurationDatetime: Date;
+	filesToIgnore: string;
 }
 
 const DEFAULT_SETTINGS: PluginSettings = {
 	previousGithubRepository: "",
 	githubRepositoryURL: "",
 	repositoryConfigurationDatetime: new Date(),
+	filesToIgnore: "",
 }
 
 export default class SyncVaultPlugin extends Plugin {

@@ -4,6 +4,7 @@
 import { exec } from "node:child_process"
 import { platform } from "node:os"
 import { promisify } from "node:util"
+import { writeFile } from "node:fs"
 
 const _exec = promisify(exec)
 
@@ -88,4 +89,25 @@ const executeGitCommand = async(command: string, vault: string):Promise<string> 
 		}
 	}
 
-export { isGitInstalled, createRepository, deleteRepository, executeGitCommand, isRemoteOriginAdded, existCommits }
+const createGitIgnore = (vault: string, files: string): Promise<string> => {
+  try {
+    const route = isWindows() ? `${vault}\\.gitignore` : `${vault}/.gitignore`
+    writeFile(route, files, "utf8", (err) => {
+      if (err) throw err
+    }) 
+
+    return Promise.resolve(`The file ${route} has been saved`)
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
+export {
+  isGitInstalled,
+  createRepository,
+  deleteRepository,
+  executeGitCommand,
+  isRemoteOriginAdded,
+  existCommits,
+  createGitIgnore,
+}

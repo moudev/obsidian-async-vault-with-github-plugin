@@ -91,6 +91,44 @@ If your plugin does not need CSS, delete this file.
   display: flex;
 }
 
+.sync-git-config-inputs
+.setting-item-info {
+  flex: 3;
+}
+
+.sync-git-config-inputs
+.setting-item-control {
+  flex: 2;
+}
+
+.sync-git-config-inputs
+.setting-item-control
+input{
+  width: 100%;
+}
+
+.sync-git-config-ignore-files {
+  display: none;
+  margin-top: 2rem;
+}
+
+.sync-git-config-ignore-files.visible {
+  display: block;
+}
+
+.sync-git-config-ignore-files textarea{
+  min-height: 130px;
+  width: 100%;
+}
+
+.sync-git-config-ignore-files .setting-item-info {
+  flex: 3;
+}
+
+.sync-git-config-ignore-files .setting-item-control {
+  flex: 2;
+}
+
 .sync-git-settings-info {
   display: none;
   margin-top: 2rem;

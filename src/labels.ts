@@ -22,6 +22,9 @@ const labels = {
   infoRepositoryBranch: "Branch:",
   infoRepositoryGitHubLink: "GitHub repository:",
   infoRepositoryConfigurationDatetime: "Configuration date:",
+  settingsIgnoreFilesLabel: "Files to ignore",
+  settingsIgnoreFilesDescription: "The relative path of the files/directories that git will ignore and not upload to GitHub. Content of the .gitignore file. One relative path for line",
+  settingsIgnoreFilesPlaceholder: "One route for line",
 }
 
 export { labels }

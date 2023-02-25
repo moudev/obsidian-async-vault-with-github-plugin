@@ -34,6 +34,7 @@ esbuild.build({
 		"node:child_process",
 		"node:util",
 		"node:os",
+		"node:fs",
 		...builtins],
 	format: "cjs",
 	watch: !prod,
