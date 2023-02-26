@@ -66,7 +66,6 @@ class SettingsTab extends PluginSettingTab {
 
 		const ignoreFilesContainer = containerEl.createDiv()
 		ignoreFilesContainer.addClass("sync-git-config-ignore-files")
-		ignoreFilesContainer.addClass("visible")
 		new Setting(ignoreFilesContainer)
 			.setName(labels.settingsIgnoreFilesLabel)
 			.setDesc(labels.settingsIgnoreFilesDescription)
