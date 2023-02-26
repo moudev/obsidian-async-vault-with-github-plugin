@@ -32,6 +32,34 @@ class SettingsTab extends PluginSettingTab {
 
 		const inputsContainer = containerEl.createDiv()
 		inputsContainer.addClass("sync-git-config-inputs")
+		new Setting(inputsContainer)
+			.setName(labels.settingsInputLabel)
+			.setDesc(labels.settingsInputDescription)
+			.addText(
+				text => text
+					.setPlaceholder(labels.settingsInputPlaceholder)
+					.setValue(this.plugin.settings.previousGithubRepository)
+					.onChange(async (value: string) => {
+						messagesContainer.toggleClass("visible", false)
+
+						this.plugin.settings.githubRepositoryURL = value
+
+						await this.plugin.saveSettings()
+
+						if (this.plugin.settings.githubRepositoryURL != this.plugin.settings.previousGithubRepository) {
+							actionsContainer.toggleClass("visible", true)
+							infoContainer.toggleClass("visible", false)
+							ignoreFilesContainer.toggleClass("visible", false)
+						} else {
+							actionsContainer.toggleClass("visible", false)
+							infoContainer.toggleClass("visible", true)
+							ignoreFilesContainer.toggleClass("visible", true)
+						}
+
+						resultsContainer.toggleClass("visible", false)
+					})
+			)
+
 
 		const actionsContainer = containerEl.createDiv()
 		actionsContainer.addClass("sync-git-config-actions")
@@ -82,34 +110,6 @@ class SettingsTab extends PluginSettingTab {
 		}
 
 		try {
-			new Setting(inputsContainer)
-			.setName(labels.settingsInputLabel)
-			.setDesc(labels.settingsInputDescription)
-			.addText(
-				text => text
-					.setPlaceholder(labels.settingsInputPlaceholder)
-					.setValue(this.plugin.settings.previousGithubRepository)
-					.onChange(async (value: string) => {
-						messagesContainer.toggleClass("visible", false)
-
-						this.plugin.settings.githubRepositoryURL = value
-
-						await this.plugin.saveSettings()
-
-						if (this.plugin.settings.githubRepositoryURL != this.plugin.settings.previousGithubRepository) {
-							actionsContainer.toggleClass("visible", true)
-							infoContainer.toggleClass("visible", false)
-							ignoreFilesContainer.toggleClass("visible", false)
-						} else {
-							actionsContainer.toggleClass("visible", false)
-							infoContainer.toggleClass("visible", true)
-							ignoreFilesContainer.toggleClass("visible", true)
-						}
-
-						resultsContainer.toggleClass("visible", false)
-					})
-			)
-
 			const submitButton = actionsContainer.createEl("button")
 			submitButton.setText(labels.settingsSubmitButton)
 			submitButton.addClass("mod-cta")
