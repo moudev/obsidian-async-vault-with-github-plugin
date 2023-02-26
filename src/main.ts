@@ -51,10 +51,10 @@ export default class SyncVaultPlugin extends Plugin {
 	}
 
 	formatResult(result: string, container: HTMLElement, checkFilesStatus = false) {
-    container.innerHTML = ""
+		container.empty()
   
     if (!result) {
-      container.textContent = ""
+      container.empty()
     }
 
 		container.toggleClass("visible", true)

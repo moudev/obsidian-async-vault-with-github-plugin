@@ -163,7 +163,7 @@ class SettingsTab extends PluginSettingTab {
 	}
 
 	async getRepositoryInfo(infoContainer: HTMLDivElement){
-		infoContainer.innerHTML = ""
+		infoContainer.empty()
 		infoContainer.toggleClass("visible", true)
 
 		const currentBranch = await executeGitCommand("branch --show-current", this.vault)
