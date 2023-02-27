@@ -44,6 +44,8 @@ export default class SyncVaultPlugin extends Plugin {
 		// https://forum.obsidian.md/t/how-to-get-vault-absolute-path/22965/6
 		const adapter = this.app.vault.adapter
 		if (adapter instanceof FileSystemAdapter) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			return this.app.vault.adapter.getBasePath()
 		}
 
