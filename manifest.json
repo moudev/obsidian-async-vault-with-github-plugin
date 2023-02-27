@@ -6,6 +6,5 @@
 	"description": "Create a backup of the vault and sync it with a GitHub repository",
 	"author": "codemart",
 	"authorUrl": "https://github.com/moudev",
-	"fundingUrl": "https://github.com/moudev",
-	"isDesktopOnly": false
+	"isDesktopOnly": true
 }
