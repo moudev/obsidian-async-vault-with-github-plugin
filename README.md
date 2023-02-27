@@ -1,96 +1,59 @@
-# Obsidian Sample Plugin
+# Sync vault with GitHub
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Obsidian **desktop** plugin to sync the obsidian vault with GitHub. **Only tested with one vault**.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+## Requirements
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
-
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
-
-## First time developing plugins?
-
-Quick starting guide for new plugin devs:
-
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
-
-## Releasing new releases
-
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
-
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
-
-## Adding your plugin to the community plugin list
-
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
-
-## How to use
-
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
+- Install [`git`](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- Install [`node.js`](https://nodejs.org/en/) and `npm`
 
 ## Manually installing the plugin
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+- Download the `.zip` file from the _releases_ page. Chose the last version plublished
+- Unzip the file and copy their content in the _plugins/_ directory of your vault. `VaultFolder/.obsidian/plugins/`
+- Enable the plugin from _Obsidian_ settings in the _Community plugins_ option
+- Follow _Plugin configurations_
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+## Plugin configurations
 
-## Funding URL
+This plugin has two things to configure. The **GitHub url repository** and **files to ignore**. Only the first is required and the other is optional.
 
-You can include funding URLs where people who use your plugin can financially support it.
+### Config the GitHub URL repository (required)
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+- Make sure to install the _requirements_
+- Configure the [GitHub credentials](https://docs.github.com/en/get-started/quickstart/set-up-git) in your computer
+- Create a GitHub repository with the name that you want. It can be public or private
+- Click on the green button "<> Code" and copy de "HTTPS" link. Example: `https://github.com/username/my-obsidian-vault.git`
+- Open _Obsidian settings_ and click in the _Plugins community_ section click in the plugin name
+- Paste the _HTTPS_ link in the _GitHub URL repository_ field and click on "Configure repository"
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
+### Config the files to ignore (optional)
+
+It's the content of the `.gitignore` file. One line for file. You can use all the [gitignore patterns](https://git-scm.com/docs/gitignore). All the files added in this field won't be tracked for changes
+
+Example:
+
+```markdown
+# .gitignore file
+ignore-specific-file.md
+.obsidian-directory/
 ```
 
-If you have multiple URLs, you can also do:
+## Make a backup
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
+- In the _Obsidian_ sidebar you will see a list of icons. Click on the icon that has the tooltip "Sync vault with GitHub"
+- A modal will be open with the list of files that has changes from the last backup. If there is not changes then the button submit won't be displayed
+- You can change the "commit message"
+- Click on the submit button and the changes will be upload to the GitHub repository
+- **Note:** only will be listed the files that aren't in the _files to ignore_ field of the plugin configurations
 
-## API Documentation
+## Development
 
-See https://github.com/obsidianmd/obsidian-api
+- Open a terminal in the path of the obsidian's vault
+- Enter in the `.obsidian/plugins/` directory
+- Clone this repo with `git clone`
+- Enter in the repository directory
+- `npm i` or `yarn` to install dependencies
+- `npm run dev` to start compilation in watch mode
+- Enable the plugin from _Obsidian_ settings in the _Community plugins_ option
+- Complete _Plugin configurations_
